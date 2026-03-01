@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git config:*)",
+      "Bash(GIT_LFS_SKIP_PUSH=1 git push:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
