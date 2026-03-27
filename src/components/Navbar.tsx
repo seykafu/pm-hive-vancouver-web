@@ -80,21 +80,38 @@ const Navbar = () => {
               </Link>
             ))}
             {user && (
-              <Link
-                to="/resources"
-                className={`relative text-sm font-medium transition-colors duration-200 py-1 ${
-                  isActive("/resources") ? "text-[#d4af37]" : "text-white hover:text-[#d4af37]"
-                }`}
-              >
-                Resources
-                {isActive("/resources") && (
-                  <motion.div
-                    layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-[#d4af37] to-[#f4d03f]"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-              </Link>
+              <>
+                <Link
+                  to="/resources"
+                  className={`relative text-sm font-medium transition-colors duration-200 py-1 ${
+                    isActive("/resources") ? "text-[#d4af37]" : "text-white hover:text-[#d4af37]"
+                  }`}
+                >
+                  Resources
+                  {isActive("/resources") && (
+                    <motion.div
+                      layoutId="nav-underline"
+                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-[#d4af37] to-[#f4d03f]"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </Link>
+                <Link
+                  to="/mentorship"
+                  className={`relative text-sm font-medium transition-colors duration-200 py-1 ${
+                    isActive("/mentorship") ? "text-[#d4af37]" : "text-white hover:text-[#d4af37]"
+                  }`}
+                >
+                  Mentorship
+                  {isActive("/mentorship") && (
+                    <motion.div
+                      layoutId="nav-underline"
+                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-[#d4af37] to-[#f4d03f]"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              </>
             )}
             <Button
               size="sm"
@@ -226,17 +243,30 @@ const Navbar = () => {
                   About Us
                 </Link>
                 {user && (
-                  <Link
-                    to="/resources"
-                    className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md ${
-                      isActive("/resources")
-                        ? "text-[#d4af37] bg-white/10"
-                        : "text-white hover:text-[#d4af37] hover:bg-white/5"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Resources
-                  </Link>
+                  <>
+                    <Link
+                      to="/resources"
+                      className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md ${
+                        isActive("/resources")
+                          ? "text-[#d4af37] bg-white/10"
+                          : "text-white hover:text-[#d4af37] hover:bg-white/5"
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Resources
+                    </Link>
+                    <Link
+                      to="/mentorship"
+                      className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md ${
+                        isActive("/mentorship")
+                          ? "text-[#d4af37] bg-white/10"
+                          : "text-white hover:text-[#d4af37] hover:bg-white/5"
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Mentorship
+                    </Link>
+                  </>
                 )}
                 <a
                   href="https://lu.ma/pmhive"

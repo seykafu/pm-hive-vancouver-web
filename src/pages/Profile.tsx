@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -10,11 +10,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
-import { Camera, Upload, User, Edit, Save, X } from 'lucide-react'
+import { Camera, User, Edit, Save, X, Users, GraduationCap, CheckCircle, Clock, XCircle, Linkedin } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import MentorshipOptInModal from '@/components/MentorshipOptInModal'
+import {
+  getUserRequests,
+  getProfilesByUserIds,
+  endMatch,
+  displayName,
+} from '@/lib/mentorship'
+import { emailMatchEnded } from '@/lib/email'
+import type { MentorshipRequest, MentorshipProfile } from '@/types/mentorship'
 
 const profileSchema = z.object({
   current_position: z.string().min(1, 'Current position is required'),
@@ -29,6 +51,13 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [showOptIn, setShowOptIn] = useState(false)
+  const [mentorshipRequests, setMentorshipRequests] = useState<{
+    incoming: MentorshipRequest[]
+    outgoing: MentorshipRequest[]
+    active: MentorshipRequest[]
+  }>({ incoming: [], outgoing: [], active: [] })
+  const [relatedProfiles, setRelatedProfiles] = useState<Record<string, MentorshipProfile>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user, profile, updateProfile, uploadProfilePicture, signOut, loading: authLoading } = useAuth()
   const { toast } = useToast()
@@ -58,11 +87,51 @@ const Profile = () => {
 
   // Handle navigation when user is not authenticated
   React.useEffect(() => {
-    // Only redirect if we're sure the user is not authenticated (not during loading)
     if (!authLoading && user === null) {
       navigate('/signin')
     }
   }, [user, authLoading, navigate])
+
+  // Load mentorship data
+  useEffect(() => {
+    if (!user || !(profile as any)?.mentorship_role) return
+    const load = async () => {
+      const result = await getUserRequests(user.id)
+      setMentorshipRequests({
+        incoming: result.incoming,
+        outgoing: result.outgoing,
+        active: result.active,
+      })
+      const allReqs = [...result.incoming, ...result.outgoing, ...result.active]
+      const ids = [...new Set(allReqs.flatMap(r => [r.mentee_id, r.mentor_id]))].filter(id => id !== user.id)
+      if (ids.length > 0) {
+        const { data: profiles } = await getProfilesByUserIds(ids)
+        const map: Record<string, MentorshipProfile> = {}
+        for (const p of profiles) map[p.user_id] = p
+        setRelatedProfiles(map)
+      }
+    }
+    load()
+  }, [user, profile])
+
+  const handleEndMatch = async (req: MentorshipRequest) => {
+    const { error } = await endMatch(req.id)
+    if (error) {
+      toast({ title: 'Error', description: (error as any).message, variant: 'destructive' })
+      return
+    }
+    const p = profile as any
+    const ismentor = req.mentor_id === user?.id
+    const otherId = ismentor ? req.mentee_id : req.mentor_id
+    const otherProf = relatedProfiles[otherId]
+    const myName = displayName(p)
+    const otherName = displayName(otherProf)
+    await emailMatchEnded({ recipient_user_id: user!.id, recipientName: myName, otherPartyName: otherName })
+    await emailMatchEnded({ recipient_user_id: otherId, recipientName: otherName, otherPartyName: myName })
+    toast({ title: 'Match ended', description: 'Both parties have been notified.' })
+    const result = await getUserRequests(user!.id)
+    setMentorshipRequests({ incoming: result.incoming, outgoing: result.outgoing, active: result.active })
+  }
 
   const onSubmit = async (data: ProfileForm) => {
     setLoading(true)
@@ -195,10 +264,21 @@ const Profile = () => {
 
   console.log('Profile component: rendering profile page for user:', user.email)
 
+  const p = profile as any
+  const mentorshipRole = p?.mentorship_role as 'mentor' | 'mentee' | null | undefined
+  const capacity = p?.mentor_capacity ?? 2
+  const activeMenteeCount = mentorshipRequests.active.filter(r => r.mentor_id === user?.id).length
+  const activeMentorCount = mentorshipRequests.active.filter(r => r.mentee_id === user?.id).length
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#000131] via-[#000131] to-[#1a1f3a]">
       <Navbar />
-      
+
+      <MentorshipOptInModal
+        open={showOptIn}
+        onClose={() => setShowOptIn(false)}
+      />
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
         <div className="space-y-8">
           {/* Profile Header */}
@@ -207,6 +287,19 @@ const Profile = () => {
             <p className="text-gray-300">Manage your PM Hive profile and preferences</p>
           </div>
 
+          <Tabs defaultValue="profile">
+            <TabsList className="bg-white/5 border border-white/10 mb-6">
+              <TabsTrigger value="profile" className="data-[state=active]:bg-[#d4af37] data-[state=active]:text-[#000131]">
+                <User className="h-4 w-4 mr-1.5" />
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="mentorship" className="data-[state=active]:bg-[#d4af37] data-[state=active]:text-[#000131]">
+                <Users className="h-4 w-4 mr-1.5" />
+                Mentorship
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Picture Section */}
             <Card className="bg-white/10 border-[#d4af37]/20 backdrop-blur-sm">
@@ -420,9 +513,149 @@ const Profile = () => {
               </Card>
             </div>
           </div>
+            </TabsContent>
+
+            {/* Mentorship Tab */}
+            <TabsContent value="mentorship">
+              {!mentorshipRole ? (
+                <Card className="bg-white/10 border-[#d4af37]/20 backdrop-blur-sm">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#d4af37] to-[#f4d03f] flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-7 w-7 text-[#000131]" />
+                    </div>
+                    <h3 className="text-white text-xl font-semibold mb-2">Join the Mentorship Program</h3>
+                    <p className="text-gray-300 mb-6">Connect with PMs who can help you grow, or give back as a mentor.</p>
+                    <Button
+                      onClick={() => setShowOptIn(true)}
+                      className="bg-gradient-to-r from-[#d4af37] to-[#f4d03f] hover:from-[#b8941f] hover:to-[#d4af37] text-[#000131] font-semibold"
+                    >
+                      Get Started
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {/* Role & status */}
+                  <Card className="bg-white/10 border-[#d4af37]/20 backdrop-blur-sm">
+                    <CardContent className="p-5 flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-3">
+                        {mentorshipRole === 'mentor' ? (
+                          <GraduationCap className="h-8 w-8 text-[#d4af37]" />
+                        ) : (
+                          <Users className="h-8 w-8 text-[#d4af37]" />
+                        )}
+                        <div>
+                          <p className="text-white font-semibold capitalize">{mentorshipRole}</p>
+                          <p className="text-gray-400 text-sm">
+                            {mentorshipRole === 'mentor'
+                              ? `${activeMenteeCount} of ${capacity} slots filled`
+                              : activeMentorCount > 0
+                              ? 'Matched with a mentor'
+                              : 'Looking for a mentor'}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge className={p?.mentorship_active ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-gray-400 border-white/10'}>
+                        {p?.mentorship_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+
+                  {/* Active matches */}
+                  {mentorshipRequests.active.length > 0 && (
+                    <div>
+                      <h3 className="text-white font-semibold mb-3">Active Matches</h3>
+                      <div className="space-y-2">
+                        {mentorshipRequests.active.map(req => {
+                          const otherId = req.mentor_id === user?.id ? req.mentee_id : req.mentor_id
+                          const other = relatedProfiles[otherId]
+                          return (
+                            <Card key={req.id} className="bg-white/5 border-green-500/20">
+                              <CardContent className="p-4 flex items-center justify-between gap-4 flex-wrap">
+                                <div className="flex items-center gap-3">
+                                  <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+                                  <div>
+                                    <p className="text-white font-medium">{displayName(other)}</p>
+                                    <p className="text-gray-400 text-sm">{other?.current_position}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {other?.linkedin_profile && (
+                                    <a href={other.linkedin_profile} target="_blank" rel="noopener noreferrer" className="text-[#d4af37]">
+                                      <Linkedin className="h-4 w-4" />
+                                    </a>
+                                  )}
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" variant="outline" className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs">
+                                        End Match
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="bg-[#000131] border-white/10">
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle className="text-white">End this match?</AlertDialogTitle>
+                                        <AlertDialogDescription className="text-gray-400">
+                                          Both you and {displayName(other)} will be notified.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel className="border-white/20 text-gray-300">Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleEndMatch(req)} className="bg-red-600 hover:bg-red-700 text-white">
+                                          End Match
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pending requests (for mentee) */}
+                  {mentorshipRole === 'mentee' && mentorshipRequests.outgoing.length > 0 && (
+                    <div>
+                      <h3 className="text-white font-semibold mb-3">Pending Requests</h3>
+                      <div className="space-y-2">
+                        {mentorshipRequests.outgoing.map(req => {
+                          const mentor = relatedProfiles[req.mentor_id]
+                          return (
+                            <Card key={req.id} className="bg-white/5 border-white/10">
+                              <CardContent className="p-4 flex items-center gap-3">
+                                {req.status === 'pending' ? (
+                                  <Clock className="h-5 w-5 text-[#d4af37] flex-shrink-0" />
+                                ) : (
+                                  <XCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                                )}
+                                <div>
+                                  <p className="text-white font-medium">{displayName(mentor)}</p>
+                                  <p className="text-gray-400 text-sm">
+                                    {req.status === 'pending' ? 'Awaiting response' : 'Declined'}
+                                  </p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <Link to="/mentorship">
+                    <Button variant="outline" className="w-full border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37]/10">
+                      Open Mentorship Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   )

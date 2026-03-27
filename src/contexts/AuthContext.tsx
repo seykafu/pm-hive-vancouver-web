@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 interface Profile {
   id: string
   user_id: string
+  full_name?: string | null
   current_position: string
   linkedin_profile: string
   specialization: string
@@ -12,6 +13,13 @@ interface Profile {
   profile_picture_url?: string
   created_at: string
   updated_at: string
+  // Mentorship fields
+  mentorship_role?: 'mentor' | 'mentee' | null
+  mentorship_active?: boolean
+  mentorship_goals?: string | null
+  experience_years?: number | null
+  mentor_capacity?: number | null
+  mentorship_dismissed_at?: string | null
 }
 
 interface AuthContextType {
