@@ -48,7 +48,6 @@ const socialTiles = [
   { href: "https://www.youtube.com/@PMHive", icon: <Youtube className="h-6 w-6" />, label: "YouTube", color: "bg-[#FF0000]", offset: 20 },
   { href: "https://open.spotify.com/show/0P6KLUdGR28tmOI7UlqF7p?si=3a39fa464c4045a9", icon: <Mic className="h-6 w-6" />, label: "PM Hive Podcast", color: "bg-[#1DB954]", offset: -10 },
   { href: "https://discord.gg/PJePVzzHxS", icon: <MessageCircle className="h-6 w-6" />, label: "Join Discord", color: "bg-[#7289DA]", offset: 15 },
-  { href: "https://chat.whatsapp.com/HIYeA3kAxnK95kfaJQPqnz", icon: <MessageCircle className="h-6 w-6" />, label: "Join WhatsApp", color: "bg-[#25D366]", offset: -5 },
 ];
 
 const Index = () => {

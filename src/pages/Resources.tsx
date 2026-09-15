@@ -130,7 +130,7 @@ const Resources = () => {
                 <h3 className="text-xl font-semibold text-white mb-4">Need Help?</h3>
                 <p className="text-gray-300 mb-4">
                   If you have trouble accessing any resources or would like to contribute materials,
-                  please reach out to us through our Discord or WhatsApp channels.
+                  please reach out to us through our Discord channel.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
@@ -140,15 +140,6 @@ const Resources = () => {
                   >
                     <a href="https://discord.gg/PJePVzzHxS" target="_blank" rel="noopener noreferrer">
                       Join Discord
-                    </a>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-[#25d366] text-[#25d366] bg-transparent hover:bg-[#25d366] hover:text-white"
-                    asChild
-                  >
-                    <a href="https://chat.whatsapp.com/HIYeA3kAxnK95kfaJQPqnz" target="_blank" rel="noopener noreferrer">
-                      Join WhatsApp
                     </a>
                   </Button>
                 </div>
