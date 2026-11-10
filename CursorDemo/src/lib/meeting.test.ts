@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   calculateMeetingImpact,
   generateEmail,
+  getVerdict,
   type ResponseIntent,
 } from "./meeting";
 
@@ -47,4 +48,18 @@ test("writes the expected request for each response intent", () => {
     assert.match(email, /“Weekly sync”/);
     assert.match(email, /\$120 CAD and 2\.0 collective focus-hours/);
   }
+});
+
+test("keeps verdict copy short, kind, and actionable", () => {
+  const verdicts = [50, 150, 450, 750].map(getVerdict);
+
+  for (const verdict of verdicts) {
+    assert.ok(verdict.title.split(/\s+/).length <= 6);
+    assert.ok(verdict.line.split(/\s+/).length <= 18);
+  }
+
+  assert.match(verdicts[0].line, /confirm the outcome/);
+  assert.match(verdicts[1].line, /ask for an agenda/);
+  assert.match(verdicts[2].line, /suggest async/);
+  assert.match(verdicts[3].line, /decline or demand a decision/);
 });

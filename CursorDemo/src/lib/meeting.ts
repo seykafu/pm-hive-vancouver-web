@@ -45,6 +45,34 @@ export function calculateMeetingImpact(
   };
 }
 
+export function getVerdict(costCad: number) {
+  if (costCad < 100) {
+    return {
+      title: "Tiny meeting, tidy agenda",
+      line: "Low stakes, still worth protecting—confirm the outcome before you click accept.",
+    };
+  }
+
+  if (costCad < 300) {
+    return {
+      title: "This sync has rent",
+      line: "Not outrageous, not free—ask for an agenda before donating the hour.",
+    };
+  }
+
+  if (costCad < 600) {
+    return {
+      title: "That invite has teeth",
+      line: "The room is getting pricey—suggest async before everyone pays in focus.",
+    };
+  }
+
+  return {
+    title: "You booked a budget",
+    line: "That is real money wearing a calendar hat—decline or demand a decision.",
+  };
+}
+
 export function generateEmail(
   intent: ResponseIntent,
   title: string,

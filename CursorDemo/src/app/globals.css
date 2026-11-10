@@ -1,15 +1,15 @@
 :root {
-  --ink: #17231f;
-  --muted: #627069;
-  --paper: #fbfaf5;
-  --panel: #ffffff;
-  --line: #dfe3dc;
-  --mint: #dff4e7;
-  --green: #176b4a;
-  --green-dark: #0f5138;
-  --coral: #ee795f;
-  --coral-soft: #fff0eb;
-  --shadow: 0 18px 55px rgba(32, 50, 42, 0.09);
+  --navy: #01032e;
+  --ink: #01032e;
+  --muted: #5c5e70;
+  --paper: #01032e;
+  --panel: #fffdf7;
+  --line: #c8c2ae;
+  --gold: #d6ae4f;
+  --gold-light: #f5e8bd;
+  --amber: #f2b33d;
+  --error: #a13b2d;
+  --shadow: 10px 10px 0 rgba(214, 174, 79, 0.2);
 }
 
 * {
@@ -23,10 +23,12 @@ html {
 
 body {
   margin: 0;
-  color: var(--ink);
+  color: var(--panel);
   background:
-    radial-gradient(circle at 12% 3%, rgba(223, 244, 231, 0.8), transparent 27rem),
-    var(--paper);
+    linear-gradient(rgba(214, 174, 79, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(214, 174, 79, 0.08) 1px, transparent 1px),
+    var(--navy);
+  background-size: 48px 48px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -50,7 +52,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid rgba(23, 107, 74, 0.28);
+  outline: 3px solid var(--amber);
   outline-offset: 2px;
 }
 
@@ -67,7 +69,7 @@ main {
 
 .eyebrow {
   margin: 0 0 10px;
-  color: var(--green);
+  color: var(--amber);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -93,7 +95,7 @@ h1 {
 .heroCopy {
   max-width: 590px;
   margin-bottom: 18px;
-  color: var(--muted);
+  color: #e1dece;
   font-size: clamp(1rem, 3vw, 1.2rem);
 }
 
@@ -102,16 +104,16 @@ h1 {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border: 1px solid #c9e4d2;
-  border-radius: 999px;
-  color: var(--green-dark);
-  background: rgba(223, 244, 231, 0.72);
+  border: 1px solid var(--gold);
+  border-radius: 0;
+  color: var(--gold-light);
+  background: rgba(1, 3, 46, 0.8);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 .privacyPill span {
-  color: #48a978;
+  color: var(--amber);
   font-size: 0.62rem;
 }
 
@@ -125,13 +127,14 @@ h1 {
 .impactCard {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 0;
   background: var(--panel);
   box-shadow: var(--shadow);
 }
 
 .card {
   padding: 22px;
+  color: var(--ink);
 }
 
 .sectionHeading {
@@ -166,9 +169,9 @@ h1 {
   width: 34px;
   height: 34px;
   place-items: center;
-  border-radius: 50%;
-  color: var(--green-dark);
-  background: var(--mint);
+  border-radius: 0;
+  color: var(--navy);
+  background: var(--gold);
   font-size: 0.7rem;
   font-weight: 800;
 }
@@ -200,7 +203,7 @@ select,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 0;
   background: #fff;
 }
 
@@ -229,21 +232,21 @@ input::placeholder {
 .duration {
   min-height: 42px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 0;
   color: var(--muted);
   background: #fff;
   font-weight: 700;
 }
 
 .duration:hover {
-  border-color: var(--green);
-  color: var(--green);
+  border-color: var(--gold);
+  color: var(--navy);
 }
 
 .duration.active {
-  border-color: var(--green);
-  color: #fff;
-  background: var(--green);
+  border-color: var(--gold);
+  color: var(--navy);
+  background: var(--gold);
 }
 
 .customDuration {
@@ -251,13 +254,13 @@ input::placeholder {
   grid-column: 1 / -1;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 0;
   background: #fff;
   overflow: hidden;
 }
 
 .customDuration:focus-within {
-  border-color: var(--green);
+  border-color: var(--gold);
 }
 
 .customDuration input {
@@ -316,34 +319,34 @@ input::placeholder {
   width: 36px;
   min-height: 46px;
   border: 0;
-  border-radius: 9px;
-  color: #a7503c;
-  background: var(--coral-soft);
+  border-radius: 0;
+  color: var(--navy);
+  background: var(--gold-light);
   font-size: 1.25rem;
 }
 
 .removeButton:hover {
-  color: #7d3828;
-  background: #ffe2d9;
+  color: var(--navy);
+  background: var(--gold);
 }
 
 .addButton {
   margin-top: 12px;
   padding: 6px 0;
   border: 0;
-  color: var(--green);
+  color: var(--navy);
   background: transparent;
   font-size: 0.85rem;
   font-weight: 800;
 }
 
 .addButton:hover {
-  color: var(--green-dark);
+  color: #6f5516;
 }
 
 .error {
   margin: 7px 0 0;
-  color: #a34131;
+  color: var(--error);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -356,7 +359,7 @@ input::placeholder {
 }
 
 .rateDetails summary {
-  color: var(--green-dark);
+  color: var(--navy);
   font-weight: 800;
   cursor: pointer;
 }
@@ -376,10 +379,8 @@ input::placeholder {
   position: relative;
   padding: 25px;
   color: #f8fbf9;
-  border: 0;
-  background:
-    radial-gradient(circle at 90% 12%, rgba(91, 174, 129, 0.28), transparent 13rem),
-    #123d2f;
+  border: 1px solid var(--gold);
+  background: #080a3e;
   overflow: hidden;
 }
 
@@ -389,14 +390,14 @@ input::placeholder {
   bottom: -34px;
   width: 130px;
   height: 130px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+  border: 1px solid rgba(214, 174, 79, 0.25);
+  border-radius: 0;
   content: "";
 }
 
 .impactLabel {
   margin-bottom: 10px;
-  color: #b8d9c9;
+  color: var(--gold);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -411,17 +412,18 @@ input::placeholder {
   font-size: clamp(3.4rem, 18vw, 5rem);
   letter-spacing: -0.06em;
   line-height: 1;
+  color: var(--amber);
 }
 
 .cost > span {
   margin-right: 4px;
-  color: #8dc4a9;
+  color: var(--gold);
   font-size: 1.9rem;
 }
 
 .cost small {
   margin-left: 12px;
-  color: #b8d9c9;
+  color: var(--gold-light);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.72rem;
   font-weight: 800;
@@ -437,25 +439,48 @@ input::placeholder {
 }
 
 .focusStat strong {
-  color: #f6b7a7;
+  color: var(--amber);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.6rem;
 }
 
 .focusStat span {
-  color: #d8e8e0;
+  color: #f1eddc;
   font-size: 0.78rem;
   line-height: 1.25;
+}
+
+.verdict {
+  position: relative;
+  z-index: 1;
+  padding: 16px 0;
+  margin-bottom: 16px;
+  border-top: 1px solid rgba(214, 174, 79, 0.45);
+  border-bottom: 1px solid rgba(214, 174, 79, 0.45);
+}
+
+.verdict h3 {
+  margin: 0 0 3px;
+  color: var(--amber);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.verdict p {
+  margin: 0;
+  color: #f1eddc;
+  font-size: 0.82rem;
 }
 
 .disclaimer {
   position: relative;
   z-index: 1;
   max-width: 520px;
-  padding-top: 16px;
+  padding-top: 0;
   margin: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  color: #abc8ba;
+  border-top: 0;
+  color: #c8c3b3;
   font-size: 0.68rem;
   line-height: 1.55;
 }
@@ -474,17 +499,17 @@ input::placeholder {
   align-items: flex-start;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 0;
   cursor: pointer;
 }
 
 .intent:hover {
-  border-color: #9ab6a6;
+  border-color: var(--gold);
 }
 
 .intent.active {
-  border-color: #78ad91;
-  background: #f0f9f3;
+  border-color: var(--gold);
+  background: #fff6d9;
 }
 
 .intent input {
@@ -492,7 +517,7 @@ input::placeholder {
   width: 17px;
   min-height: 17px;
   margin: 3px 0 0;
-  accent-color: var(--green);
+  accent-color: var(--navy);
 }
 
 .intent strong,
@@ -544,15 +569,15 @@ textarea {
   padding: 0 18px;
   margin-top: 12px;
   border: 0;
-  border-radius: 10px;
-  color: #fff;
-  background: var(--coral);
-  box-shadow: 0 8px 18px rgba(201, 88, 64, 0.18);
+  border-radius: 0;
+  color: var(--navy);
+  background: var(--gold);
+  box-shadow: 5px 5px 0 var(--navy);
   font-weight: 800;
 }
 
 .copyButton:hover:not(:disabled) {
-  background: #d9654c;
+  background: var(--amber);
 }
 
 .copyButton:disabled {
@@ -563,13 +588,13 @@ textarea {
 .copyStatus {
   min-height: 20px;
   margin: 7px 0 -8px;
-  color: var(--green);
+  color: var(--navy);
   font-size: 0.74rem;
   font-weight: 700;
 }
 
 .copyStatus.error {
-  color: #a34131;
+  color: var(--error);
 }
 
 .srOnly {

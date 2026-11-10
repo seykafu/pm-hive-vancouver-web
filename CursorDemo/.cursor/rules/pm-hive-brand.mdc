@@ -1,0 +1,14 @@
+---
+description: Applies PM Hive colours, geometry, spelling, and voice to every product change.
+alwaysApply: true
+---
+
+# PM Hive brand
+
+- Use navy `#01032E` for the primary background.
+- Use gold `#D6AE4F` for buttons and primary actions.
+- Use amber `#F2B33D` for large numbers and impact figures.
+- Use sharp corners. Avoid pills, circles, and decorative rounding.
+- Use Canadian spelling.
+- Write warm, direct, slightly cheeky product copy.
+- Keep contrast, focus visibility, and interaction states accessible.

@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import {
   calculateMeetingImpact,
   generateEmail,
+  getVerdict,
   ROLES,
   type ResponseIntent,
 } from "@/lib/meeting";
@@ -16,9 +17,9 @@ type EditableGroup = {
 };
 
 const intents: { value: ResponseIntent; label: string; description: string }[] = [
-  { value: "decline", label: "Politely decline", description: "Protect the time and leave a path back." },
-  { value: "agenda", label: "Ask for clarity", description: "Request the agenda and decision needed." },
-  { value: "async", label: "Suggest async", description: "Move the discussion into a written update." },
+  { value: "decline", label: "Kindly decline", description: "Save the hour without burning the bridge." },
+  { value: "agenda", label: "Ask for receipts", description: "Request the agenda and decision needed." },
+  { value: "async", label: "Take it async", description: "Move the chat somewhere calendars cannot multiply." },
 ];
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
     () => generateEmail(intent, title, impact.costCad, impact.focusHours),
     [intent, title, impact],
   );
+  const verdict = getVerdict(impact.costCad);
   const email = emailDraft ?? generatedEmail;
   const durationValid = Number.isFinite(duration) && duration >= 1 && duration <= 480;
   const attendeesValid =
@@ -98,11 +100,11 @@ export default function Home() {
   return (
     <main>
       <header className="hero">
-        <p className="eyebrow">Meeting cost pushback</p>
-        <h1>Make the invisible cost visible.</h1>
+        <p className="eyebrow">PM Hive · Meeting maths</p>
+        <h1>That meeting isn&apos;t free.</h1>
         <p className="heroCopy">
-          Price the room, protect the focus time, and send a thoughtful response
-          in under a minute.
+          See what the room costs, then send a kind little no—or ask for a
+          better reason.
         </p>
         <div className="privacyPill" aria-label="Privacy information">
           <span aria-hidden="true">●</span> Private by design — nothing leaves this page
@@ -115,7 +117,7 @@ export default function Home() {
             <span className="step">01</span>
             <div>
               <h2 id="meeting-heading">Price the meeting</h2>
-              <p>Use rough role mix or simple headcount.</p>
+              <p>Add the room. We&apos;ll do the uncomfortable maths.</p>
             </div>
           </div>
 
@@ -243,7 +245,7 @@ export default function Home() {
 
         <aside className="resultsColumn" aria-label="Meeting impact and response">
           <section className="impactCard" aria-labelledby="impact-heading">
-            <p className="impactLabel" id="impact-heading">Estimated meeting impact</p>
+            <p className="impactLabel" id="impact-heading">The damage, roughly</p>
             <div className="cost">
               <span>~</span>${impact.costCad.toLocaleString("en-CA")}
               <small>CAD</small>
@@ -251,6 +253,10 @@ export default function Home() {
             <div className="focusStat">
               <strong>{impact.focusHours.toFixed(1)}</strong>
               <span>collective focus-hours across {attendeeCount} {attendeeCount === 1 ? "person" : "people"}</span>
+            </div>
+            <div className="verdict" aria-live="polite">
+              <h3>{verdict.title}</h3>
+              <p>{verdict.line}</p>
             </div>
             <p className="disclaimer">
               Illustrative estimate only. Rates use rough, fictional Vancouver
@@ -264,8 +270,8 @@ export default function Home() {
             <div className="sectionHeading compact">
               <span className="step">02</span>
               <div>
-                <h2 id="response-heading">Choose your response</h2>
-                <p>Start with a clear, respectful ask.</p>
+                <h2 id="response-heading">Push back, politely</h2>
+                <p>Firm can still be friendly. Pick your flavour.</p>
               </div>
             </div>
 
@@ -313,7 +319,7 @@ export default function Home() {
               disabled={!formValid}
               onClick={copyEmail}
             >
-              <span>{copyState === "copied" ? "Copied" : "Copy response"}</span>
+              <span>{copyState === "copied" ? "Copied. Lovely." : "Copy the polite pushback"}</span>
               <span aria-hidden="true">{copyState === "copied" ? "✓" : "↗"}</span>
             </button>
             <p className={copyState === "error" ? "copyStatus error" : "copyStatus"} aria-live="polite">
