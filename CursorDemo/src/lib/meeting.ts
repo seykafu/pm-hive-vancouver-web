@@ -12,6 +12,11 @@ export type Role = {
   hourlyCad: number;
 };
 
+export type TimerSnapshot = {
+  accumulatedMs: number;
+  startedAtMs: number | null;
+};
+
 export const ROLES: readonly Role[] = [
   { id: "attendee", label: "Attendee / unspecified", annualCad: 100_000, hourlyCad: 48 },
   { id: "pm", label: "Product manager", annualCad: 120_000, hourlyCad: 58 },
@@ -45,6 +50,47 @@ export function calculateMeetingImpact(
   };
 }
 
+export function calculateLiveMeetingCost(
+  attendees: readonly AttendeeGroup[],
+  elapsedMs: number,
+) {
+  const hours = Math.max(0, elapsedMs) / 3_600_000;
+
+  return attendees.reduce((sum, group) => {
+    const role = ROLES.find((item) => item.id === group.roleId);
+    if (!role || group.count < 1 || !Number.isFinite(group.count)) return sum;
+    return sum + group.count * role.hourlyCad * hours;
+  }, 0);
+}
+
+export function getElapsedMs(timer: TimerSnapshot, nowMs: number) {
+  const activeMs =
+    timer.startedAtMs === null ? 0 : Math.max(0, nowMs - timer.startedAtMs);
+  return Math.max(0, timer.accumulatedMs) + activeMs;
+}
+
+export function startTimer(timer: TimerSnapshot, nowMs: number): TimerSnapshot {
+  if (timer.startedAtMs !== null) return timer;
+  return { ...timer, startedAtMs: nowMs };
+}
+
+export function pauseTimer(timer: TimerSnapshot, nowMs: number): TimerSnapshot {
+  if (timer.startedAtMs === null) return timer;
+  return {
+    accumulatedMs: getElapsedMs(timer, nowMs),
+    startedAtMs: null,
+  };
+}
+
+export function formatElapsedTime(elapsedMs: number) {
+  const totalSeconds = Math.floor(Math.max(0, elapsedMs) / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [minutes, seconds].map((part) => part.toString().padStart(2, "0"));
+  return hours > 0 ? `${hours.toString().padStart(2, "0")}:${parts.join(":")}` : parts.join(":");
+}
+
 export function getVerdict(costCad: number) {
   if (costCad < 100) {
     return {
@@ -71,6 +117,10 @@ export function getVerdict(costCad: number) {
     title: "You booked a budget",
     line: "That is real money wearing a calendar hat—decline or demand a decision.",
   };
+}
+
+export function formatVerdict(title: string, line: string) {
+  return `${title.trim()}\n${line.trim()}`;
 }
 
 export function generateEmail(

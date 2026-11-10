@@ -2,9 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  calculateLiveMeetingCost,
   calculateMeetingImpact,
+  formatElapsedTime,
+  formatVerdict,
   generateEmail,
+  getElapsedMs,
   getVerdict,
+  pauseTimer,
+  startTimer,
   type ResponseIntent,
 } from "./meeting";
 
@@ -62,4 +68,38 @@ test("keeps verdict copy short, kind, and actionable", () => {
   assert.match(verdicts[1].line, /ask for an agenda/);
   assert.match(verdicts[2].line, /suggest async/);
   assert.match(verdicts[3].line, /decline or demand a decision/);
+});
+
+test("preserves accumulated time across pause and resume", () => {
+  const initial = { accumulatedMs: 0, startedAtMs: null };
+  const firstRun = startTimer(initial, 1_000);
+  const paused = pauseTimer(firstRun, 6_000);
+
+  assert.equal(getElapsedMs(paused, 20_000), 5_000);
+
+  const resumed = startTimer(paused, 20_000);
+  assert.equal(getElapsedMs(resumed, 23_500), 8_500);
+  assert.deepEqual(pauseTimer(resumed, 24_000), {
+    accumulatedMs: 9_000,
+    startedAtMs: null,
+  });
+});
+
+test("calculates live cost from the full accumulated elapsed time", () => {
+  const timer = pauseTimer(
+    startTimer({ accumulatedMs: 30 * 60_000, startedAtMs: null }, 10_000),
+    25 * 60_000 + 10_000,
+  );
+
+  assert.equal(getElapsedMs(timer, 99_000), 55 * 60_000);
+  assert.equal(
+    calculateLiveMeetingCost([{ roleId: "executive", count: 1 }], getElapsedMs(timer, 99_000)),
+    88,
+  );
+});
+
+test("formats timer and verdict clipboard text", () => {
+  assert.equal(formatElapsedTime(65_999), "01:05");
+  assert.equal(formatElapsedTime(3_665_000), "01:01:05");
+  assert.equal(formatVerdict("  A verdict  ", "  A useful line. "), "A verdict\nA useful line.");
 });

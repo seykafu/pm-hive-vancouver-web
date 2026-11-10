@@ -1,13 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  calculateLiveMeetingCost,
   calculateMeetingImpact,
+  formatElapsedTime,
+  formatVerdict,
   generateEmail,
+  getElapsedMs,
   getVerdict,
+  pauseTimer,
   ROLES,
+  startTimer,
   type ResponseIntent,
+  type TimerSnapshot,
 } from "@/lib/meeting";
 
 type EditableGroup = {
@@ -15,6 +22,9 @@ type EditableGroup = {
   roleId: string;
   count: number;
 };
+
+type Theme = "light" | "dark";
+type CopyState = "idle" | "copied" | "error";
 
 const intents: { value: ResponseIntent; label: string; description: string }[] = [
   { value: "decline", label: "Kindly decline", description: "Save the hour without burning the bridge." },
@@ -32,8 +42,23 @@ export default function Home() {
   const [nextUid, setNextUid] = useState(3);
   const [intent, setIntent] = useState<ResponseIntent>("async");
   const [emailDraft, setEmailDraft] = useState<string | null>(null);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [verdictCopyState, setVerdictCopyState] = useState<CopyState>("idle");
+  const [timer, setTimer] = useState<TimerSnapshot>({
+    accumulatedMs: 0,
+    startedAtMs: null,
+  });
+  const [clockNow, setClockNow] = useState(0);
   const emailRef = useRef<HTMLTextAreaElement>(null);
+  const verdictFallbackRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (timer.startedAtMs === null) return;
+    const updateClock = () => setClockNow(Date.now());
+    updateClock();
+    const interval = window.setInterval(updateClock, 250);
+    return () => window.clearInterval(interval);
+  }, [timer.startedAtMs]);
 
   const impact = useMemo(
     () => calculateMeetingImpact(groups, duration),
@@ -43,7 +68,12 @@ export default function Home() {
     () => generateEmail(intent, title, impact.costCad, impact.focusHours),
     [intent, title, impact],
   );
-  const verdict = getVerdict(impact.costCad);
+  const elapsedMs = getElapsedMs(timer, clockNow);
+  const timerStarted = timer.startedAtMs !== null || timer.accumulatedMs > 0;
+  const liveCost = calculateLiveMeetingCost(groups, elapsedMs);
+  const displayedCost = timerStarted ? liveCost : impact.costCad;
+  const verdict = getVerdict(displayedCost);
+  const verdictText = formatVerdict(verdict.title, verdict.line);
   const email = emailDraft ?? generatedEmail;
   const durationValid = Number.isFinite(duration) && duration >= 1 && duration <= 480;
   const attendeesValid =
@@ -54,6 +84,9 @@ export default function Home() {
     (total, group) => total + (Number.isFinite(group.count) ? Math.max(group.count, 0) : 0),
     0,
   );
+  const displayedFocusHours = timerStarted
+    ? attendeeCount * elapsedMs / 3_600_000
+    : impact.focusHours;
 
   function updateInputs(callback: () => void) {
     callback();
@@ -97,10 +130,59 @@ export default function Home() {
     }
   }
 
+  function toggleTheme() {
+    const nextTheme: Theme =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.colorScheme = nextTheme;
+    window.localStorage.setItem("meeting-theme", nextTheme);
+  }
+
+  async function copyVerdict() {
+    try {
+      await navigator.clipboard.writeText(verdictText);
+      setVerdictCopyState("copied");
+      window.setTimeout(() => setVerdictCopyState("idle"), 1800);
+    } catch {
+      setVerdictCopyState("error");
+      window.requestAnimationFrame(() => {
+        verdictFallbackRef.current?.focus();
+        verdictFallbackRef.current?.select();
+      });
+    }
+  }
+
+  function beginTimer() {
+    const now = Date.now();
+    setClockNow(now);
+    setTimer((current) => startTimer(current, now));
+  }
+
+  function holdTimer() {
+    const now = Date.now();
+    setClockNow(now);
+    setTimer((current) => pauseTimer(current, now));
+  }
+
+  function resetTimer() {
+    setTimer({ accumulatedMs: 0, startedAtMs: null });
+    setClockNow(0);
+  }
+
   return (
     <main>
       <header className="hero">
-        <p className="eyebrow">PM Hive · Meeting maths</p>
+        <div className="heroBar">
+          <p className="eyebrow">PM Hive · Meeting maths</p>
+          <button
+            type="button"
+            className="themeToggle"
+            onClick={toggleTheme}
+          >
+            <span className="themeWhenLight"><span aria-hidden="true">☾</span> Dark mode</span>
+            <span className="themeWhenDark"><span aria-hidden="true">☀</span> Light mode</span>
+          </button>
+        </div>
         <h1>That meeting isn&apos;t free.</h1>
         <p className="heroCopy">
           See what the room costs, then send a kind little no—or ask for a
@@ -247,16 +329,64 @@ export default function Home() {
           <section className="impactCard" aria-labelledby="impact-heading">
             <p className="impactLabel" id="impact-heading">The damage, roughly</p>
             <div className="cost">
-              <span>~</span>${impact.costCad.toLocaleString("en-CA")}
+              <span>~</span>$
+              {timerStarted
+                ? displayedCost.toLocaleString("en-CA", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                : displayedCost.toLocaleString("en-CA")}
               <small>CAD</small>
             </div>
+            <div className="liveTimer" aria-label="Live meeting cost timer">
+              <div>
+                <span>Live meeting timer</span>
+                <strong aria-live="off">{formatElapsedTime(elapsedMs)}</strong>
+              </div>
+              <div className="timerControls">
+                {timer.startedAtMs === null ? (
+                  <button type="button" onClick={beginTimer}>
+                    {timer.accumulatedMs > 0 ? "Resume" : "Start"}
+                  </button>
+                ) : (
+                  <button type="button" onClick={holdTimer}>Pause</button>
+                )}
+                <button
+                  type="button"
+                  className="timerReset"
+                  onClick={resetTimer}
+                  disabled={!timerStarted}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
             <div className="focusStat">
-              <strong>{impact.focusHours.toFixed(1)}</strong>
-              <span>collective focus-hours across {attendeeCount} {attendeeCount === 1 ? "person" : "people"}</span>
+              <strong>{displayedFocusHours.toFixed(timerStarted ? 2 : 1)}</strong>
+              <span>{timerStarted ? "elapsed " : ""}collective focus-hours across {attendeeCount} {attendeeCount === 1 ? "person" : "people"}</span>
             </div>
             <div className="verdict" aria-live="polite">
+              <div className="verdictHeading">
+                <span>Verdict</span>
+                <button type="button" onClick={copyVerdict}>
+                  {verdictCopyState === "copied" ? "Copied ✓" : "Copy verdict"}
+                </button>
+              </div>
               <h3>{verdict.title}</h3>
               <p>{verdict.line}</p>
+              <p className="verdictCopyStatus" aria-live="polite">
+                {verdictCopyState === "copied" && "Verdict copied to your clipboard."}
+                {verdictCopyState === "error" && "Clipboard unavailable. The verdict is selected below—copy it manually."}
+              </p>
+              {verdictCopyState === "error" && (
+                <textarea
+                  ref={verdictFallbackRef}
+                  className="verdictFallback"
+                  readOnly
+                  value={verdictText}
+                  aria-label="Verdict text to copy manually"
+                />
+              )}
             </div>
             <p className="disclaimer">
               Illustrative estimate only. Rates use rough, fictional Vancouver
