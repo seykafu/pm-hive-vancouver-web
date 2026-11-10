@@ -1,15 +1,13 @@
 :root {
-  --navy: #01032e;
-  --ink: #01032e;
-  --muted: #5c5e70;
-  --paper: #01032e;
-  --panel: #fffdf7;
-  --line: #c8c2ae;
-  --gold: #d6ae4f;
-  --gold-light: #f5e8bd;
-  --amber: #f2b33d;
-  --error: #a13b2d;
-  --shadow: 10px 10px 0 rgba(214, 174, 79, 0.2);
+  --red: #d02f46;
+  --primary: #ed8182;
+  --blush: #f5e4e1;
+  --ink: #721c2b;
+  --muted: #80525b;
+  --panel: #fff9f7;
+  --line: #d9a6a7;
+  --error: #9c1f35;
+  --shadow: 10px 10px 0 rgba(208, 47, 70, 0.16);
 }
 
 * {
@@ -18,16 +16,16 @@
 
 html {
   min-width: 320px;
-  background: var(--paper);
+  background: var(--blush);
 }
 
 body {
   margin: 0;
-  color: var(--panel);
+  color: var(--red);
   background:
-    linear-gradient(rgba(214, 174, 79, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(214, 174, 79, 0.08) 1px, transparent 1px),
-    var(--navy);
+    linear-gradient(rgba(208, 47, 70, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(208, 47, 70, 0.06) 1px, transparent 1px),
+    var(--blush);
   background-size: 48px 48px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
@@ -52,7 +50,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid var(--amber);
+  outline: 3px solid var(--red);
   outline-offset: 2px;
 }
 
@@ -69,7 +67,7 @@ main {
 
 .eyebrow {
   margin: 0 0 10px;
-  color: var(--amber);
+  color: var(--red);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -90,12 +88,13 @@ h1 {
   font-weight: 500;
   letter-spacing: -0.055em;
   line-height: 0.96;
+  color: var(--primary);
 }
 
 .heroCopy {
   max-width: 590px;
   margin-bottom: 18px;
-  color: #e1dece;
+  color: var(--ink);
   font-size: clamp(1rem, 3vw, 1.2rem);
 }
 
@@ -104,16 +103,16 @@ h1 {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border: 1px solid var(--gold);
+  border: 1px solid var(--red);
   border-radius: 0;
-  color: var(--gold-light);
-  background: rgba(1, 3, 46, 0.8);
+  color: var(--red);
+  background: rgba(255, 249, 247, 0.55);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 .privacyPill span {
-  color: var(--amber);
+  color: var(--primary);
   font-size: 0.62rem;
 }
 
@@ -170,8 +169,8 @@ h1 {
   height: 34px;
   place-items: center;
   border-radius: 0;
-  color: var(--navy);
-  background: var(--gold);
+  color: var(--panel);
+  background: var(--red);
   font-size: 0.7rem;
   font-weight: 800;
 }
@@ -239,14 +238,14 @@ input::placeholder {
 }
 
 .duration:hover {
-  border-color: var(--gold);
-  color: var(--navy);
+  border-color: var(--red);
+  color: var(--red);
 }
 
 .duration.active {
-  border-color: var(--gold);
-  color: var(--navy);
-  background: var(--gold);
+  border-color: var(--red);
+  color: var(--panel);
+  background: var(--red);
 }
 
 .customDuration {
@@ -260,7 +259,7 @@ input::placeholder {
 }
 
 .customDuration:focus-within {
-  border-color: var(--gold);
+  border-color: var(--red);
 }
 
 .customDuration input {
@@ -320,28 +319,28 @@ input::placeholder {
   min-height: 46px;
   border: 0;
   border-radius: 0;
-  color: var(--navy);
-  background: var(--gold-light);
+  color: var(--red);
+  background: var(--blush);
   font-size: 1.25rem;
 }
 
 .removeButton:hover {
-  color: var(--navy);
-  background: var(--gold);
+  color: var(--panel);
+  background: var(--red);
 }
 
 .addButton {
   margin-top: 12px;
   padding: 6px 0;
   border: 0;
-  color: var(--navy);
+  color: var(--red);
   background: transparent;
   font-size: 0.85rem;
   font-weight: 800;
 }
 
 .addButton:hover {
-  color: #6f5516;
+  color: var(--ink);
 }
 
 .error {
@@ -359,7 +358,7 @@ input::placeholder {
 }
 
 .rateDetails summary {
-  color: var(--navy);
+  color: var(--red);
   font-weight: 800;
   cursor: pointer;
 }
@@ -378,9 +377,9 @@ input::placeholder {
 .impactCard {
   position: relative;
   padding: 25px;
-  color: #f8fbf9;
-  border: 1px solid var(--gold);
-  background: #080a3e;
+  color: var(--red);
+  border: 1px solid var(--red);
+  background: var(--blush);
   overflow: hidden;
 }
 
@@ -390,14 +389,14 @@ input::placeholder {
   bottom: -34px;
   width: 130px;
   height: 130px;
-  border: 1px solid rgba(214, 174, 79, 0.25);
+  border: 1px solid rgba(208, 47, 70, 0.2);
   border-radius: 0;
   content: "";
 }
 
 .impactLabel {
   margin-bottom: 10px;
-  color: var(--gold);
+  color: var(--red);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -412,18 +411,18 @@ input::placeholder {
   font-size: clamp(3.4rem, 18vw, 5rem);
   letter-spacing: -0.06em;
   line-height: 1;
-  color: var(--amber);
+  color: var(--primary);
 }
 
 .cost > span {
   margin-right: 4px;
-  color: var(--gold);
+  color: var(--primary);
   font-size: 1.9rem;
 }
 
 .cost small {
   margin-left: 12px;
-  color: var(--gold-light);
+  color: var(--red);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.72rem;
   font-weight: 800;
@@ -439,13 +438,13 @@ input::placeholder {
 }
 
 .focusStat strong {
-  color: var(--amber);
+  color: var(--primary);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.6rem;
 }
 
 .focusStat span {
-  color: #f1eddc;
+  color: var(--ink);
   font-size: 0.78rem;
   line-height: 1.25;
 }
@@ -455,13 +454,13 @@ input::placeholder {
   z-index: 1;
   padding: 16px 0;
   margin-bottom: 16px;
-  border-top: 1px solid rgba(214, 174, 79, 0.45);
-  border-bottom: 1px solid rgba(214, 174, 79, 0.45);
+  border-top: 1px solid rgba(208, 47, 70, 0.3);
+  border-bottom: 1px solid rgba(208, 47, 70, 0.3);
 }
 
 .verdict h3 {
   margin: 0 0 3px;
-  color: var(--amber);
+  color: var(--red);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.35rem;
   font-weight: 500;
@@ -469,7 +468,7 @@ input::placeholder {
 
 .verdict p {
   margin: 0;
-  color: #f1eddc;
+  color: var(--ink);
   font-size: 0.82rem;
 }
 
@@ -480,7 +479,7 @@ input::placeholder {
   padding-top: 0;
   margin: 0;
   border-top: 0;
-  color: #c8c3b3;
+  color: var(--muted);
   font-size: 0.68rem;
   line-height: 1.55;
 }
@@ -504,12 +503,12 @@ input::placeholder {
 }
 
 .intent:hover {
-  border-color: var(--gold);
+  border-color: var(--red);
 }
 
 .intent.active {
-  border-color: var(--gold);
-  background: #fff6d9;
+  border-color: var(--red);
+  background: var(--blush);
 }
 
 .intent input {
@@ -517,7 +516,7 @@ input::placeholder {
   width: 17px;
   min-height: 17px;
   margin: 3px 0 0;
-  accent-color: var(--navy);
+  accent-color: var(--red);
 }
 
 .intent strong,
@@ -553,8 +552,8 @@ textarea {
   min-height: 210px;
   padding: 14px;
   resize: vertical;
-  color: #35413c;
-  background: #fcfcfa;
+  color: var(--ink);
+  background: #fff;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.82rem;
   line-height: 1.55;
@@ -570,14 +569,14 @@ textarea {
   margin-top: 12px;
   border: 0;
   border-radius: 0;
-  color: var(--navy);
-  background: var(--gold);
-  box-shadow: 5px 5px 0 var(--navy);
+  color: var(--panel);
+  background: var(--red);
+  box-shadow: 5px 5px 0 var(--primary);
   font-weight: 800;
 }
 
 .copyButton:hover:not(:disabled) {
-  background: var(--amber);
+  background: var(--ink);
 }
 
 .copyButton:disabled {
@@ -588,7 +587,7 @@ textarea {
 .copyStatus {
   min-height: 20px;
   margin: 7px 0 -8px;
-  color: var(--navy);
+  color: var(--red);
   font-size: 0.74rem;
   font-weight: 700;
 }

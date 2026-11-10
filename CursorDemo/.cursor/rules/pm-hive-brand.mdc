@@ -5,9 +5,9 @@ alwaysApply: true
 
 # PM Hive brand
 
-- Use navy `#01032E` for the primary background.
-- Use gold `#D6AE4F` for buttons and primary actions.
-- Use amber `#F2B33D` for large numbers and impact figures.
+- Use blush `#F5E4E1` for the primary background.
+- Use coral `#ED8182` for large headlines and impact figures.
+- Use deep red `#D02F46` for labels, borders, and primary actions.
 - Use sharp corners. Avoid pills, circles, and decorative rounding.
 - Use Canadian spelling.
 - Write warm, direct, slightly cheeky product copy.
