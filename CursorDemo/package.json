@@ -1,0 +1,28 @@
+{
+  "name": "meeting-cost-pushback",
+  "version": "1.0.0",
+  "description": "A fast meeting-cost calculator and pushback email composer.",
+  "scripts": {
+    "test": "tsx --test src/lib/*.test.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "private": true,
+  "dependencies": {
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.6",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  }
+}
